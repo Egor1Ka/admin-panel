@@ -1,7 +1,7 @@
 <template>
   <form
     @submit.prevent="handleSubmit"
-    class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6"
+    class="mx-auto grid grid-cols-1 md:grid-cols-3 gap-6"
   >
     <!-- Левая часть -->
     <div class="md:col-span-2 space-y-6">

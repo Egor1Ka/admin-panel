@@ -1,16 +1,13 @@
 <template>
-  <h1 class="text-xl font-bold mb-4">{{ t("create_product") }}</h1>
-  <!-- <ProductCreateForm
-    @success="handleSuccess"
-    :categories="normalizedCategories"
-    :currencies="normalizedCurrencies"
-  /> -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold mb-8">Создать продукт</h1>
 
-  <ProductForm
-    @submit="onCreateProduct"
-    :categories="normalizedCategories"
-    :currencies="normalizedCurrencies"
-  />
+    <ProductForm
+      @submit="onCreateProduct"
+      :categories="normalizedCategories"
+      :currencies="normalizedCurrencies"
+    />
+  </div>
 </template>
 
 <script setup>

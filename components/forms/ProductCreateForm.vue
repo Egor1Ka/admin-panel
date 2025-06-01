@@ -207,7 +207,6 @@ const fetchCategoryAttrs = async () => {
 };
 
 const addVariant = () => {
-  console.log("addVariant", addVariant);
   const attrObj = {};
   categoryAttrs.value.forEach((attr) => (attrObj[attr.name] = ""));
   form.value.variants.push({

@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="onSubmit" class="max-w-4xl mx-auto mt-8">
+  <form @submit.prevent="onSubmit" class="mt-8">
     <div class="flex gap-6 mb-6">
       <!-- Левая колонка -->
       <div class="flex-1 bg-white rounded-2xl shadow p-8 flex flex-col gap-6">
