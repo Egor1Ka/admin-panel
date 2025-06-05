@@ -36,7 +36,7 @@
         <ul class="space-y-2">
           <li>
             <NuxtLink
-              to="/dashboard"
+              to="/attributes"
               class="flex items-center px-3 py-2 rounded-xl text-gray-700 hover:bg-blue-100 transition font-medium"
               active-class="bg-blue-50 text-blue-700"
               @click="closeOnMobile"
@@ -56,7 +56,7 @@
                   ></path>
                 </svg>
               </span>
-              Dashboard
+              Attributes
             </NuxtLink>
           </li>
           <li>

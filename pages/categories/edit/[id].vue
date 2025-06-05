@@ -3,17 +3,19 @@
     :category="category"
     :categories="normalizedCategories"
     :error="error"
+    :attributes="attributes"
     @submit="submit"
   />
 </template>
 
 <script setup>
-import CategoryForm from "@/components/forms/Category.vue";
+import CategoryForm from "@/components/forms/CategoryForm.vue";
 import {
   getCategoryById,
   updateCategory,
 } from "@/utils/api/server/category.js";
 import { useRoute, useRouter } from "vue-router";
+import { getAttributes } from "~/utils/api/server/attributes";
 import { bufferToBase64 } from "@/utils/bufferToBase64.js";
 
 const route = useRoute();
@@ -31,6 +33,12 @@ const { data: categoriesData } = await useAsyncData("categories", () =>
 
 const { data: categoryData, error } = await useAsyncData("category", () =>
   getCategoryById(id).then((res) => res.data)
+);
+
+const { data: attributes } = await useAsyncData("attributes", () =>
+  getAttributes().then((res) => {
+    return res.data;
+  })
 );
 
 const category = categoryData.value;

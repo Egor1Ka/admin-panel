@@ -6,14 +6,20 @@
         <h2 class="text-2xl font-bold mb-4 text-gray-900">Основное</h2>
 
         <div class="flex-1 flex gap-6">
-          <CategorySelect
-            v-model="form.categoryId"
-            :categories="categories"
-            :disabled="isEditMode"
-            :default-value="'Выберите категорию'"
-            label="Категория"
-            @change="onCategoryChange"
-          />
+          <div>
+            <label class="block mb-1">Категория</label>
+
+            <select
+              :disabled="!!productProps.categoryId"
+              class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500"
+              v-model="form.categoryId"
+            >
+              <option value="">Выберите категорию</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                {{ cat.title }}
+              </option>
+            </select>
+          </div>
 
           <div class="flex-1">
             <label class="block mb-1 font-medium text-gray-700">Название</label>
@@ -70,35 +76,6 @@
           </div>
         </div>
 
-        <!-- Теги -->
-        <div>
-          <label class="block mb-1 font-medium text-gray-700">Теги</label>
-          <div
-            class="flex flex-wrap items-center gap-2 border border-gray-300 rounded-lg p-2 bg-gray-50"
-          >
-            <span
-              v-for="(tag, i) in form.tags"
-              :key="i"
-              class="bg-blue-100 text-blue-700 px-2 py-1 rounded flex items-center"
-            >
-              {{ tag }}
-              <button
-                type="button"
-                class="ml-1 text-blue-500 hover:text-red-500"
-                @click="removeTag(i)"
-              >
-                ×
-              </button>
-            </span>
-            <input
-              v-model="tagInput"
-              @keydown.enter.prevent="addTag"
-              placeholder="Новый тег"
-              class="border-none outline-none flex-1 min-w-[80px] bg-transparent"
-            />
-          </div>
-        </div>
-
         <!-- Статус -->
         <div>
           <label class="block mb-1 font-medium text-gray-700">Статус</label>
@@ -127,21 +104,21 @@
     <h3 class="text-xl font-bold mb-4" v-if="form.variants.length">
       Варианты товара
     </h3>
+
     <ProducyVariantsBlock
-      v-if="form.variants.length"
+      v-if="form.variants.length || categoryAttrs.attributes?.length"
       v-model:variants="form.variants"
-      v-model:categoryAttrs="categoryAttrs"
+      :categoryAttrs="categoryAttrs"
       :currencies="currencies"
       @add-variant="addVariant"
+      :categoryId="form.categoryId"
     />
 
     <button
       class="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-semibold shadow hover:bg-blue-700 transition cursor-pointer"
-      :disabled="loading"
     >
-      {{ loading ? "Сохраняем..." : buttonText }}
+      {{ buttonText }}
     </button>
-    <div v-if="error" class="text-red-500 text-center mt-2">{{ error }}</div>
   </form>
 </template>
 
@@ -151,17 +128,20 @@ import CategorySelect from "@/components/CategorySelect.vue";
 import ProducyVariantsBlock from "@/components/forms/blocks/ProducyVariantsBlock.vue";
 import MultiUploadImage from "@/components/UI/MultiUploadImage.vue";
 
-const props = defineProps({
+const {
+  product: productProps,
+  categories,
+  currencies,
+  buttonText,
+  categoryAttrs,
+} = defineProps({
   product: { type: Object, default: () => ({}) },
   categories: { type: Array, default: () => [] },
   currencies: { type: Array, default: () => [] },
-  loading: { type: Boolean, default: false },
-  error: { type: String, default: "" },
+  categoryAttrs: { type: Object, default: () => ({}) },
   buttonText: { type: String, default: "Создать продукт" },
 });
-const emit = defineEmits(["submit"]);
-
-const isEditMode = computed(() => !!props.product?._id);
+const emit = defineEmits(["submit", "getCategoryValues"]);
 
 const form = ref({
   images: [],
@@ -176,129 +156,72 @@ const form = ref({
   attributes: {},
   variants: [],
 });
-const categoryAttrs = ref([]);
-const tagInput = ref("");
-
-// ================================
-// Служебные функции
-// ================================
-function resetForm() {
-  return {
-    images: [],
-    quantity: 0,
-    defaultPrice: 0,
-    name: "",
-    currency: "",
-    description: "",
-    categoryId: "",
-    tags: [],
-    status: "draft",
-    attributes: {},
-    variants: [],
-  };
-}
-
-// Синхронизация вариантов с categoryAttrs
-function syncVariantsWithAttrs() {
-  form.value.variants = form.value.variants.map((variant) => {
-    const attrs = { ...variant.attributes };
-    categoryAttrs.value.forEach((attr) => {
-      if (!(attr.name in attrs)) attrs[attr.name] = "";
-    });
-    Object.keys(attrs).forEach((key) => {
-      if (!categoryAttrs.value.some((a) => a.name === key)) delete attrs[key];
-    });
-    return { ...variant, attributes: attrs };
-  });
-}
 
 watch(
-  () => props.product,
-  async (prod) => {
+  () => productProps,
+  (prod) => {
     if (prod && Object.keys(prod).length) {
       form.value = {
-        ...resetForm(),
         ...prod,
         images: prod.images ? [...prod.images] : [],
         tags: prod.tags ? [...prod.tags] : [],
         variants: prod.variants ? [...prod.variants] : [],
         attributes: prod.attributes ? { ...prod.attributes } : {},
+        description: prod.description || "",
         categoryId:
           typeof prod.categoryId === "object" && prod.categoryId?._id
             ? prod.categoryId._id
             : prod.categoryId || "",
       };
-      // Получаем атрибуты категории
-      if (form.value.categoryId) {
-        await fetchCategoryAttrs(form.value.categoryId);
-      } else if (
-        form.value.variants.length &&
-        form.value.variants[0].attributes
-      ) {
-        // Если нет категории, но есть варианты — делаем categoryAttrs из варианта
-        categoryAttrs.value = Object.keys(
-          form.value.variants[0].attributes
-        ).map((name) => ({ name, type: "string" }));
-      }
-      syncVariantsWithAttrs();
-    } else {
-      resetForm();
     }
   },
   { immediate: true }
 );
-// Следим за категорией (для create)
-function onCategoryChange(catId) {
-  if (!isEditMode.value && catId) fetchCategoryAttrs(catId);
-}
 
-// ================================
-// Эмуляция API для атрибутов (замени на свой API)
-async function fetchCategoryAttrs(catId) {
-  // categoryAttrs.value = await getCategoryAttrsFromApi(catId); // заменишь на свой API
-  // Вот пример мок-атрибутов:
-  categoryAttrs.value = [
-    { name: "Размер", type: "string" },
-    { name: "Цвет", type: "string" },
-  ];
-  // Если вариантов нет — создаём один вариант для заполнения:
-  if (!form.value.variants.length) {
-    addVariant();
+onMounted(() => {
+  if (productProps.categoryId) {
+    emit("getCategoryValues", productProps.categoryId._id);
   }
-  syncVariantsWithAttrs();
-}
+});
 
-// ================================
-// Работа с вариантами и тегами
-// ================================
-function addVariant() {
-  const attrs = {};
-  categoryAttrs.value.forEach((attr) => (attrs[attr.name] = ""));
+watch(
+  () => form.value.categoryId,
+  (newValue) => {
+    emit("getCategoryValues", newValue);
+  }
+);
+
+const addVariant = () => {
+  const getDefaultAttributes = (attribut) => {
+    return {
+      value: "",
+      attribute: attribut._id,
+    };
+  };
+
   form.value.variants.push({
     sku: "",
-    attributes: attrs,
+    attributes: categoryAttrs.attributes.map(getDefaultAttributes),
     price: 0,
     currency: "",
     quantity: 0,
     images: [],
   });
-}
-function addTag() {
-  const value = tagInput.value.trim();
-  if (value && !form.value.tags.includes(value)) form.value.tags.push(value);
-  tagInput.value = "";
-}
-function removeTag(idx) {
-  form.value.tags.splice(idx, 1);
-}
-function handleImages(event) {
-  const files = Array.from(event.target.files || []);
-  form.value.images = files;
-}
+};
 
-// ================================
-// Сабмит
-// ================================
+watch(
+  () => categoryAttrs.attributes,
+  (attrs) => {
+    if (
+      form.value.variants.length === 0 &&
+      Array.isArray(attrs) &&
+      attrs.length > 0
+    ) {
+      addVariant();
+    }
+  }
+);
+
 function onSubmit() {
   emit("submit", { ...form.value });
 }

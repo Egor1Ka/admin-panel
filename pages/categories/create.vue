@@ -1,14 +1,18 @@
 <template>
-  <h1 class="text-xl font-bold mb-4">{{ t("create_category") }}</h1>
-  <CategoryForm @submit="onCreateCategory" :categories="normalizedCategories" />
+  <h1 class="text-xl font-bold mb-4">{{ t("create_category") }} 2</h1>
+  <CategoryForm
+    @submit="onCreateCategory"
+    :categories="normalizedCategories"
+    :attributes="attributes"
+  />
 </template>
 
 <script setup>
-// import CategoryForm from "@/components/forms/CategoryFormCreate.vue";
-import CategoryForm from "@/components/forms/Category.vue";
+import CategoryForm from "@/components/forms/CategoryForm.vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { getCategories, createCategory } from "@/utils/api/server/category.js";
+import { getAttributes } from "@/utils/api/server/attributes";
 
 const categoriesMapper = ({ _id, name }) => ({
   id: _id,
@@ -21,6 +25,12 @@ const {
   error,
 } = await useAsyncData("categories", () =>
   getCategories().then((res) => res.data)
+);
+
+const { data: attributes } = await useAsyncData("attributes", () =>
+  getAttributes().then((res) => {
+    return res.data;
+  })
 );
 
 const categories = categoriesData.value || [];

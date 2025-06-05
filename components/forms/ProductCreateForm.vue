@@ -227,6 +227,7 @@ const addTag = () => {
   }
   tagInput.value = "";
 };
+
 const removeTag = (idx) => {
   form.value.tags.splice(idx, 1);
 };

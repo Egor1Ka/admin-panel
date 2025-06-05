@@ -4,8 +4,10 @@
     :product="product"
     :categories="normalizedCategories"
     :currencies="normalizedCurrencies"
+    :categoryAttrs="categoryAttrs"
     button-text="Сохранить изменения"
     @submit="submit"
+    @getCategoryValues="getCategoryValues"
   />
 </template>
 
@@ -15,14 +17,18 @@ import { useRoute, useRouter } from "vue-router";
 import { getProductById, updateProduct } from "@/utils/api/server/product.js";
 import { getCategories } from "@/utils/api/server/category.js";
 import { getCurrencies } from "@/utils/api/server/currency.js";
+import { getCategoryAttrs } from "@/utils/api/server/category.js";
 
 const route = useRoute();
 const router = useRouter();
 const id = route.params.id;
 
-const categoriesMapper = ({ _id, name }) => ({
+const categoryAttrs = ref({});
+
+const categoriesMapper = ({ _id, name, attributes }) => ({
   id: _id,
   title: name,
+  attributes,
 });
 
 const currenciesMapper = ({ symbol, code, _id }) => ({ symbol, code, id: _id });
@@ -39,13 +45,17 @@ const { data: currenciesData } = await useAsyncData("currencies", () =>
   getCurrencies().then((res) => res.data)
 );
 
+const product = productData.value || {};
 const categories = categoriesData.value || [];
-
 const currencies = currenciesData.value || [];
 
 const normalizedCategories = categories.map(categoriesMapper);
 const normalizedCurrencies = currencies.map(currenciesMapper);
-const product = productData.value || {};
+
+const getCategoryValues = async (category) => {
+  const { data } = await getCategoryAttrs(category);
+  categoryAttrs.value = { ...data };
+};
 
 const handleSuccess = () => router.push("/products");
 

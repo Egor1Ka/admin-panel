@@ -19,4 +19,14 @@ const updateCategory = async (id, data) => {
   });
 };
 
-export { createCategory, getCategoryById, getCategories, updateCategory };
+const getCategoryAttrs = async (id) => {
+  return await apiFetch(`/category/${id}/attributes`);
+};
+
+export {
+  createCategory,
+  getCategoryById,
+  getCategories,
+  updateCategory,
+  getCategoryAttrs,
+};

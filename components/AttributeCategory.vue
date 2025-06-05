@@ -1,27 +1,14 @@
 <template>
-  <div v-for="(attr, idx) in attributes" :key="idx" class="flex gap-2 mb-2">
-    <input
-      v-model.trim="attr.name"
-      placeholder="Название"
-      class="border rounded p-2 flex-1"
-    />
-    <select v-model="attr.type" class="border rounded p-2 w-32">
+  <div class="flex flex-col">
+    <select v-model="attributes" class="w-full">
       <option
-        v-for="attributeType in attributeTypes"
-        :value="attributeType.type"
-        :key="attributeType.type"
+        v-for="attr in props.attributes"
+        :key="attr._id"
+        :value="attr._id"
       >
-        {{ t(`attribute_type_${attributeType.type}`) }}
+        {{ attr.name }}
       </option>
     </select>
-    <button
-      type="button"
-      @click="removeAttribute(idx)"
-      class="px-2 py-1 bg-red-500 text-white rounded"
-      v-if="attributes.length > 1"
-    >
-      –
-    </button>
   </div>
   <button
     type="button"
@@ -42,6 +29,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  attributes: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -51,7 +42,7 @@ const attributes = ref([...props.modelValue]);
 watch(attributes, (val) => emit("update:modelValue", val), { deep: true });
 
 function addAttribute() {
-  attributes.value.push({ name: "", type: "string" });
+  attributes.value.push();
 }
 
 function removeAttribute(idx) {

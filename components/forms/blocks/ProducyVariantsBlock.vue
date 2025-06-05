@@ -25,7 +25,6 @@
         />
       </svg>
     </button>
-
     <div>
       <div>
         <label class="block mb-1 font-medium text-gray-700">SKU</label>
@@ -83,28 +82,24 @@
 
     <!-- Динамические атрибуты -->
     <div class="">
-      <div v-for="attr in localCategoryAttrs" :key="attr.name" class="mb-2">
+      <div
+        v-for="(attr, index) in localCategoryAttrs"
+        :key="attr.name"
+        class="mb-2"
+      >
         <label class="block mb-1 font-medium text-gray-700">{{
           attr.name
         }}</label>
-
-        <template v-if="attr.type === 'number'">
-          <input
-            type="number"
-            v-model="variant.attributes[attr.name]"
-            class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500"
-            required
-            :placeholder="`Введите ${attr.name}`"
-          />
-        </template>
-        <template v-else>
-          <input
-            v-model="variant.attributes[attr.name]"
-            class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500"
-            required
-            :placeholder="`Введите ${attr.name}`"
-          />
-        </template>
+        <select
+          v-if="attr.type === 'select'"
+          v-model="variant.attributes[index].value"
+          class="border rounded p-2"
+        >
+          <option :value="''" disabled>Выберите {{ attr.name }}</option>
+          <option v-for="val in attr.values" :value="val.id" :key="val.id">
+            {{ val.value }}
+          </option>
+        </select>
       </div>
     </div>
   </div>
@@ -123,16 +118,18 @@ import MultiUploadImage from "@/components/UI/MultiUploadImage";
 
 const { variants, categoryAttrs, currencies } = defineProps({
   variants: Array,
-  categoryAttrs: Array,
+  categoryAttrs: Object,
   currencies: Array,
+  categoryId: String | Object,
 });
 
 const localVariants = computed({
   get: () => variants,
   set: (val) => emit("update:variants", val),
 });
+
 const localCategoryAttrs = computed({
-  get: () => categoryAttrs,
+  get: () => categoryAttrs.attributes,
   set: (val) => emit("update:categoryAttrs", val),
 });
 
