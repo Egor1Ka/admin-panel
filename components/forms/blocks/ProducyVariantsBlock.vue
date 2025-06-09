@@ -59,19 +59,11 @@
           />
         </div>
         <div class="flex-1">
-          <label class="block mb-1 font-medium text-gray-700">Валюта</label>
-          <select
+          <AdminSelect
             v-model="variant.currency"
-            class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-          >
-            <option
-              v-for="currency in currencies"
-              :key="currency.code"
-              :value="currency.id"
-            >
-              {{ currency.code }}
-            </option>
-          </select>
+            :options="normalizeCurrenciesOptions(currencies)"
+            label="Валюта"
+          />
         </div>
       </div>
     </div>
@@ -87,19 +79,13 @@
         :key="attr.name"
         class="mb-2"
       >
-        <label class="block mb-1 font-medium text-gray-700">{{
-          attr.name
-        }}</label>
-        <select
+        <AdminSelect
           v-if="attr.type === 'select'"
           v-model="variant.attributes[index].value"
-          class="border rounded p-2"
-        >
-          <option :value="''" disabled>Выберите {{ attr.name }}</option>
-          <option v-for="val in attr.values" :value="val.id" :key="val.id">
-            {{ val.value }}
-          </option>
-        </select>
+          :options="normalizeAttributesValues(attr.values)"
+          :label="attr.name"
+          :defaultValue="`Выберите ${attr.name}`"
+        />
       </div>
     </div>
   </div>
@@ -115,6 +101,7 @@
 
 <script setup>
 import MultiUploadImage from "@/components/UI/MultiUploadImage";
+import AdminSelect from "@/components/UI/AdminSelect";
 
 const { variants, categoryAttrs, currencies } = defineProps({
   variants: Array,
@@ -142,4 +129,18 @@ const emit = defineEmits([
   "update:categoryAttrs",
   "add-variant",
 ]);
+
+const normalizeAttributesValues = (attrs) => {
+  return attrs.map((attr) => ({
+    value: attr.id,
+    label: attr.value,
+  }));
+};
+
+const normalizeCurrenciesOptions = (currencies) => {
+  return currencies.map((currency) => ({
+    value: currency.id,
+    label: currency.code,
+  }));
+};
 </script>

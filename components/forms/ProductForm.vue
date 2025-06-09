@@ -8,7 +8,6 @@
         <div class="flex-1 flex gap-6">
           <div>
             <label class="block mb-1">Категория</label>
-
             <select
               :disabled="!!productProps.categoryId"
               class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500"
@@ -22,12 +21,12 @@
           </div>
 
           <div class="flex-1">
-            <label class="block mb-1 font-medium text-gray-700">Название</label>
-            <input
+            <AdminInput
               v-model="form.name"
+              :label="'Название'"
               placeholder="Введите название"
-              class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500"
               required
+              class="w-full"
             />
           </div>
         </div>
@@ -47,10 +46,10 @@
         <!-- Цена, валюта, количество (в строку) -->
         <div class="flex gap-4">
           <div class="flex-1">
-            <label class="block mb-1 font-medium text-gray-700">Цена</label>
-            <input
+            <AdminInput
               type="number"
               v-model.number="form.defaultPrice"
+              :label="'Цена'"
               class="input-base w-full"
               required
             />
@@ -64,12 +63,10 @@
             </select>
           </div>
           <div class="flex-1">
-            <label class="block mb-1 font-medium text-gray-700"
-              >Количество</label
-            >
-            <input
+            <AdminInput
               type="number"
               v-model.number="form.quantity"
+              :label="'Количество'"
               class="input-base w-full"
               required
             />
@@ -100,7 +97,6 @@
     </div>
 
     <!-- Варианты товара -->
-
     <h3 class="text-xl font-bold mb-4" v-if="form.variants.length">
       Варианты товара
     </h3>
@@ -124,9 +120,9 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import CategorySelect from "@/components/CategorySelect.vue";
 import ProducyVariantsBlock from "@/components/forms/blocks/ProducyVariantsBlock.vue";
 import MultiUploadImage from "@/components/UI/MultiUploadImage.vue";
+import AdminInput from "@/components/UI/AdminInput.vue";
 
 const {
   product: productProps,

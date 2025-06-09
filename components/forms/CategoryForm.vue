@@ -3,32 +3,25 @@
     @submit.prevent="handleSubmit"
     class="mx-auto grid grid-cols-1 md:grid-cols-3 gap-6"
   >
-    <!-- Левая часть -->
     <div class="md:col-span-2 space-y-6">
       <div class="bg-white rounded-2xl shadow p-6">
         <h2 class="text-xl font-bold mb-4">{{ t("general") }}</h2>
-        <div class="mb-4">
-          <label class="block font-medium mb-1 text-gray-700">{{
-            t("category_name")
-          }}</label>
-          <input
-            v-model.trim="form.name"
-            class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-            required
-            placeholder="Введите название"
-          />
-        </div>
-        <div class="mb-4">
-          <label class="block font-medium mb-1 text-gray-700">{{
-            t("slug")
-          }}</label>
-          <input
-            v-model.trim="form.slug"
-            class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-            required
-            placeholder="Введите slug"
-          />
-        </div>
+        <AdminInput
+          class="mb-4"
+          v-model.trim="form.name"
+          :label="t('category_name')"
+          required
+          placeholder="Введите название"
+        />
+
+        <AdminInput
+          class="mb-4"
+          v-model.trim="form.slug"
+          :label="t('slug')"
+          required
+          placeholder="Введите slug"
+        />
+
         <div class="mb-4">
           <CategorySelect
             v-model="form.parentId"
@@ -38,17 +31,14 @@
             :required="false"
           />
         </div>
-        <div class="mb-4">
-          <label class="block font-medium mb-1 text-gray-700">{{
-            t("description")
-          }}</label>
-          <textarea
-            v-model.trim="form.description"
-            class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-            rows="3"
-            placeholder="Описание"
-          />
-        </div>
+
+        <AdminTextarea
+          class="mb-4"
+          v-model.trim="form.description"
+          :label="t('description')"
+          :rows="3"
+          placeholder="Описание"
+        />
       </div>
 
       <div class="bg-white rounded-2xl shadow p-6 mb-6">
@@ -58,19 +48,11 @@
           :key="idx"
           class="flex items-center gap-2 mb-2"
         >
-          <select
+          <AdminSelect
             v-model="form.attributes[idx]"
-            class="border border-gray-300 rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-          >
-            <option disabled value="">Выберите атрибут</option>
-            <option
-              v-for="attr in availableAttributes(idx)"
-              :key="attr._id"
-              :value="attr._id"
-            >
-              {{ attr.name }}
-            </option>
-          </select>
+            :options="availableAttributes(idx)"
+            default-value="Выберите атрибут"
+          />
           <button
             type="button"
             @click="removeAttribute(idx)"
@@ -123,6 +105,9 @@ import { useI18n } from "vue-i18n";
 import CategorySelect from "@/components/CategorySelect";
 import UploadImg from "@/components/UI/UploadImg";
 import EntityStatus from "@/components/EntityStatus";
+import AdminTextarea from "@/components/UI/AdminTextarea.vue";
+import AdminInput from "@/components/UI/AdminInput.vue";
+import AdminSelect from "../UI/AdminSelect.vue";
 
 // Универсальные пропсы:
 const emit = defineEmits(["submit", "success"]);
@@ -219,11 +204,17 @@ const availableAttributes = (idx) => {
   const selectedExceptCurrent = form.value.attributes.filter(
     (_, i) => i !== idx
   );
-  return props.attributes.filter(
-    (attr) =>
-      !selectedExceptCurrent.includes(attr._id) ||
-      attr._id === form.value.attributes[idx]
-  );
+
+  const attributesFilter = (attr) =>
+    !selectedExceptCurrent.includes(attr._id) ||
+    attr._id === form.value.attributes[idx];
+
+  const normalizeAttributes = (attr) => ({
+    value: attr._id,
+    label: attr.name,
+  });
+
+  return props.attributes.filter(attributesFilter).map(normalizeAttributes);
 };
 
 function getAttributesId(attribut) {
