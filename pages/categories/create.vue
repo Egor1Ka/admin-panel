@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-xl font-bold mb-4">{{ t("create_category") }} 2</h1>
+  <h1 class="text-xl font-bold mb-4">{{ t("create_category") }}</h1>
   <CategoryForm
     @submit="onCreateCategory"
     :categories="normalizedCategories"

@@ -1,48 +1,28 @@
 <template>
   <form @submit.prevent="submit(form)" class="space-y-6">
-    <!-- Name -->
-    <div>
-      <label class="block text-gray-700 font-semibold mb-1" for="name">
-        Название
-      </label>
-      <input
-        v-model="form.name"
-        type="text"
-        id="name"
-        class="w-full border rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-        placeholder="Введите название"
-        required
-      />
-    </div>
+    <AdminInput
+      v-model.trim="form.name"
+      placeholder="Введите название"
+      label="Название"
+      required
+    />
 
     <!-- Code -->
-    <div>
-      <label class="block text-gray-700 font-semibold mb-1" for="code">
-        Код
-      </label>
-      <input
-        v-model="form.code"
-        type="text"
-        id="code"
-        class="w-full border rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-        placeholder="Введите код"
-        required
-      />
-    </div>
 
-    <!-- Type -->
-    <div>
-      <label class="block text-gray-700 font-semibold mb-1" for="type">
-        Тип
-      </label>
-      <select
-        v-model="form.type"
-        id="type"
-        class="w-full border rounded-lg px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
-      >
-        <option value="select">Select</option>
-      </select>
-    </div>
+    <AdminInput
+      v-model.trim="form.code"
+      placeholder="Введите код"
+      label="Код"
+      required
+    />
+
+    <AdminSelect
+      v-model="form.type"
+      :options="atributeTypes"
+      default-value="select"
+      label="Тип"
+      required
+    />
 
     <!-- Values -->
     <div>
@@ -87,6 +67,16 @@
 </template>
 
 <script setup>
+import AdminInput from "@/components/UI/AdminInput.vue";
+import AdminSelect from "../UI/AdminSelect.vue";
+
+const atributeTypes = [
+  {
+    value: "select",
+    label: "select",
+  },
+];
+
 const {
   attribute,
   values: propsvalues,
