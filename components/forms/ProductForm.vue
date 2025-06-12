@@ -119,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, watch } from "vue";
 import ProducyVariantsBlock from "@/components/forms/blocks/ProducyVariantsBlock.vue";
 import MultiUploadImage from "@/components/UI/MultiUploadImage.vue";
 import AdminInput from "@/components/UI/AdminInput.vue";
