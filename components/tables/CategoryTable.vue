@@ -34,8 +34,8 @@
               class="flex items-center justify-center h-16 w-16 bg-gray-100 rounded border border-gray-200 overflow-hidden"
             >
               <img
-                v-if="getCategoryImg(category)"
-                :src="getCategoryImg(category)"
+                v-if="category.image.url"
+                :src="category.image.url"
                 class="object-contain h-full w-full"
               />
               <span v-else class="text-gray-400 text-sm">No Img</span>
@@ -103,23 +103,6 @@ const props = defineProps({
     default: () => [],
   },
 });
-
-function getCategoryImg(category) {
-  if (!category.image || !category.imageType) return "";
-  if (typeof category.image === "string") {
-    return `data:${category.imageType};base64,${category.image}`;
-  }
-  if (category.image?.data && category.imageType) {
-    const uint8Array = new Uint8Array(category.image.data);
-    const binaryString = uint8Array.reduce(
-      (acc, byte) => acc + String.fromCharCode(byte),
-      ""
-    );
-    const base64 = btoa(binaryString);
-    return `data:${category.imageType};base64,${base64}`;
-  }
-  return "";
-}
 </script>
 
 <i18n>
