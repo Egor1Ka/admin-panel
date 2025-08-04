@@ -127,22 +127,14 @@ const props = defineProps({
   },
 });
 
-// Получаем первую картинку первого варианта (можно доработать)
 function getProductImg(product) {
   const images = product.images;
   if (!images) return "";
-  // Если images — массив строк (base64 или url)
   const imgObj = images?.[0];
 
   if (!imgObj) return "";
 
-  if (typeof imgObj === "object" && imgObj.image && imgObj.imageType) {
-    return `data:${imgObj.imageType};base64,${imgObj.image}`;
-  }
-  if (typeof imgObj === "string") {
-    return imgObj.startsWith("data:") ? imgObj : "";
-  }
-  return "";
+  return imgObj.url;
 }
 
 const getVariantsQuantity = (variants) => {

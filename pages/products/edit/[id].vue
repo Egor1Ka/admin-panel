@@ -1,6 +1,7 @@
 <template>
   <h1 class="text-xl font-bold mb-4">Редактировать продукт</h1>
   <ProductForm
+    :loading="loading"
     :product="product"
     :categories="normalizedCategories"
     :currencies="normalizedCurrencies"
@@ -12,6 +13,7 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import ProductForm from "@/components/forms/ProductForm.vue";
 import { useRoute, useRouter } from "vue-router";
 import { getProductById, updateProduct } from "@/utils/api/server/product.js";
@@ -24,6 +26,7 @@ const router = useRouter();
 const id = route.params.id;
 
 const categoryAttrs = ref({});
+const loading = ref(false);
 
 const categoriesMapper = ({ _id, name, attributes }) => ({
   id: _id,
@@ -72,11 +75,13 @@ const normalizeRequest = (formData) => {
 
 const submit = async (formData) => {
   try {
+    loading.value = true;
     const normalizedRequestData = normalizeRequest(formData);
     await updateProduct(id, normalizedRequestData);
   } catch (e) {
     // error.value = e.message || "Ошибка при создании категории";
   } finally {
+    loading.value = false;
     handleSuccess();
   }
 };

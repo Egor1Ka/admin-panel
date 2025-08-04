@@ -2,17 +2,19 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <h1 class="text-2xl font-bold mb-8">Создать продукт</h1>
     <ProductForm
-      @submit="onCreateProduct"
+      :loading="loading"
       :categories="normalizedCategories"
       :currencies="normalizedCurrencies"
       :categoryAttrs="categoryAttrs"
       @getCategoryValues="getCategoryValues"
+      @submit="onCreateProduct"
     />
   </div>
 </template>
 
 <script setup>
 import ProductForm from "~/components/forms/ProductForm.vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { getCategories } from "@/utils/api/server/category.js";
@@ -29,6 +31,7 @@ const categoriesMapper = ({ _id, name, attributes }) => ({
 const currenciesMapper = ({ symbol, code, _id }) => ({ symbol, code, id: _id });
 
 const categoryAttrs = ref({});
+const loading = ref(false);
 
 const { data: categoriesData } = await useAsyncData("categories", () =>
   getCategories().then((res) => res.data)
@@ -53,16 +56,14 @@ const router = useRouter();
 const handleSuccess = () => router.push("/products");
 
 const onCreateProduct = async (formData) => {
-  //loading.value = true;
-  //error.value = "";
-
   try {
+    loading.value = true;
     await createProduct(formData);
     handleSuccess();
   } catch (e) {
     // error.value = e.message || "Ошибка при создании";
   } finally {
-    //loading.value = false;
+    loading.value = false;
   }
 };
 

@@ -110,11 +110,11 @@
       :categoryId="form.categoryId"
     />
 
-    <button
-      class="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-semibold shadow hover:bg-blue-700 transition cursor-pointer"
-    >
-      {{ buttonText }}
-    </button>
+    <AdminButton :disabled="loading">
+      <template #text>
+        {{ buttonText }}
+      </template>
+    </AdminButton>
   </form>
 </template>
 
@@ -123,6 +123,7 @@ import { ref, watch } from "vue";
 import ProducyVariantsBlock from "@/components/forms/blocks/ProducyVariantsBlock.vue";
 import MultiUploadImage from "@/components/UI/MultiUploadImage.vue";
 import AdminInput from "@/components/UI/AdminInput.vue";
+import AdminButton from "../UI/AdminButton.vue";
 
 const {
   product: productProps,
@@ -130,12 +131,14 @@ const {
   currencies,
   buttonText,
   categoryAttrs,
+  loading,
 } = defineProps({
   product: { type: Object, default: () => ({}) },
   categories: { type: Array, default: () => [] },
   currencies: { type: Array, default: () => [] },
   categoryAttrs: { type: Object, default: () => ({}) },
   buttonText: { type: String, default: "Создать продукт" },
+  loading: { type: Boolean, default: false },
 });
 const emit = defineEmits(["submit", "getCategoryValues"]);
 

@@ -1,4 +1,3 @@
-<!-- components/ImageUploader.vue -->
 <template>
   <div>
     <div class="mb-2 font-medium text-gray-700">{{ label }}</div>
@@ -37,7 +36,9 @@
         class="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-white"
       >
         <img
-          :src="`data:${img.imageType};base64,${img.image}`"
+          :src="
+            isValidUrl(img.url) ? img.url : `data:image/jpeg;base64,${img.url}`
+          "
           class="w-full h-full object-cover rounded-lg"
           alt="img"
         />
@@ -50,7 +51,7 @@
         >
           ×
         </button>
-      </div>  
+      </div>
     </div>
   </div>
 </template>
@@ -67,17 +68,6 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 const localImages = ref([...props.modelValue]);
 
-// Синхронизируем если родитель передал новое значение
-watch(
-  () => props.modelValue,
-  (val) => {
-    if (JSON.stringify(val) !== JSON.stringify(localImages.value)) {
-      localImages.value = [...val];
-    }
-  }
-);
-
-// Watch локальный стейт и эмитим наружу (но не мутируем props напрямую!)
 watch(
   localImages,
   (val) => {
@@ -86,20 +76,13 @@ watch(
   { deep: true }
 );
 
-function addImage(img) {
-  localImages.value.push(img); // Только через локальный ref!
-}
-
 function handleFiles(event) {
   const files = Array.from(event.target.files);
   if (!files.length) return;
   files.forEach((file) => {
     const reader = new FileReader();
     reader.onload = () => {
-      localImages.value.push({
-        image: reader.result.split(",")[1],
-        imageType: file.type,
-      });
+      localImages.value.push({ url: reader.result.split(",")[1] });
     };
     reader.readAsDataURL(file);
   });
