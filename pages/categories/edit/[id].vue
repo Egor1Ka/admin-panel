@@ -1,5 +1,6 @@
 <template>
   <CategoryForm
+    :loading="loading"
     :category="category"
     :categories="normalizedCategories"
     :error="error"
@@ -9,6 +10,7 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import CategoryForm from "@/components/forms/CategoryForm.vue";
 import {
   getCategoryById,
@@ -21,6 +23,8 @@ import { bufferToBase64 } from "@/utils/bufferToBase64.js";
 const route = useRoute();
 const router = useRouter();
 const id = route.params.id;
+
+const loading = ref(false);
 
 const categoriesMapper = ({ _id, name }) => ({
   id: _id,
@@ -59,11 +63,15 @@ const normalizeRequest = (formData) => {
 
 const submit = async (formData) => {
   try {
+    console.log("formData", formData);
+    loading.value = true;
     const normalizedRequestData = normalizeRequest(formData);
     await updateCategory(id, normalizedRequestData);
+    loading.value = false;
   } catch (e) {
     error.value = e.message || "Ошибка при создании категории";
   } finally {
+    loading.value = false;
     handleSuccess();
   }
 };

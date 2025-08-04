@@ -1,6 +1,7 @@
 <template>
   <h1 class="text-xl font-bold mb-4">{{ t("create_category") }}</h1>
   <CategoryForm
+    :loading="loading"
     @submit="onCreateCategory"
     :categories="normalizedCategories"
     :attributes="attributes"
@@ -18,6 +19,8 @@ const categoriesMapper = ({ _id, name }) => ({
   id: _id,
   title: name,
 });
+
+const loading = ref(false);
 
 const {
   data: categoriesData,
@@ -40,19 +43,15 @@ const router = useRouter();
 const handleSuccess = () => router.push("/categories");
 
 const onCreateCategory = async (formData) => {
-  // formData = все данные из CategoryForm, включая картинку, slug и т.д.
-  // loading.value = true;
-  // error.value = "";
   try {
-    // например, ты вызываешь свой API
+    loading.value = true;
+    console.log({ formData });
     await createCategory(formData);
-    // тут можешь делать редирект или пушить в список
-    // router.push('/categories') или emit('success')
   } catch (e) {
     error.value = e.message || "Ошибка при создании категории";
   } finally {
     handleSuccess();
-    //loading.value = false;
+    loading.value = false;
   }
 };
 

@@ -3,9 +3,13 @@
     class="border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer w-full h-36 transition hover:border-blue-400"
   >
     <input type="file" class="hidden" @change="handleFile" />
-    <div v-if="image" class="flex flex-col items-center">
+    <div v-if="image.url" class="flex flex-col items-center">
       <img
-        :src="`data:${imageType};base64,${image}`"
+        :src="
+          isValidUrl(image.url)
+            ? image.url
+            : `data:${imageType};base64,${image.url}`
+        "
         alt="banner"
         class="h-24 rounded mb-2 object-contain"
       />
@@ -30,6 +34,7 @@
   </label>
 </template>
 <script setup>
+import { isValidUrl } from "@/utils/link.js";
 const { label, image, imageType, successImageLable } = defineProps({
   label: {
     type: String,
@@ -39,7 +44,7 @@ const { label, image, imageType, successImageLable } = defineProps({
     type: String,
     default: "Change image",
   },
-  image: String,
+  image: { url: String },
   imageType: String,
 });
 

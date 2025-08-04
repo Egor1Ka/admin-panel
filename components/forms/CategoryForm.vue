@@ -89,11 +89,12 @@
         <h2 class="text-xl font-bold mb-4">{{ t("status") }}</h2>
         <EntityStatus v-model="form.status" />
       </div>
-      <button
-        class="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl mt-4 shadow hover:bg-blue-700 transition cursor-pointer"
-      >
-        {{ isEdit ? t("save") : t("create") }}
-      </button>
+      <AdminButton :disabled="loading">
+        <template #text>
+          {{ isEdit ? t("save") : t("create") }}
+        </template>
+      </AdminButton>
+
       <!-- <div v-if="error" class="text-red-500 text-center">{{ error }}</div> -->
     </div>
   </form>
@@ -108,6 +109,7 @@ import EntityStatus from "@/components/EntityStatus";
 import AdminTextarea from "@/components/UI/AdminTextarea.vue";
 import AdminInput from "@/components/UI/AdminInput.vue";
 import AdminSelect from "../UI/AdminSelect.vue";
+import AdminButton from "../UI/AdminButton.vue";
 
 // Универсальные пропсы:
 const emit = defineEmits(["submit", "success"]);
@@ -116,6 +118,7 @@ const props = defineProps({
   category: { type: Object, default: null }, // если есть — режим edit
   categories: { type: Array, default: () => [] },
   attributes: { type: Array, default: () => [] },
+  loading: { type: Boolean, default: false },
 });
 
 // Местный стейт для формы
@@ -126,7 +129,7 @@ const form = ref({
   metaTitle: "",
   metaKeywords: "",
   parentId: "",
-  image: "",
+  image: {},
   imageType: "",
   status: "draft",
   attributes: [],
@@ -147,7 +150,7 @@ watch(
         metaTitle: "",
         metaKeywords: "",
         parentId: "",
-        image: "",
+        image: {},
         imageType: "",
         status: "draft",
         attributes: [],
@@ -160,7 +163,7 @@ watch(
         metaTitle: cat.metaTitle || "",
         metaKeywords: cat.metaKeywords || "",
         parentId: cat.parentId || "",
-        image: cat.image || "",
+        image: cat.image || {},
         imageType: cat.imageType || "",
         status: cat.status || "draft",
         attributes: Array.isArray(cat.attributes)
@@ -178,7 +181,7 @@ const handleFile = (event) => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    form.value.image = reader.result.split(",")[1];
+    form.value.image = { url: reader.result.split(",")[1] };
     form.value.imageType = file.type;
   };
   reader.readAsDataURL(file);
