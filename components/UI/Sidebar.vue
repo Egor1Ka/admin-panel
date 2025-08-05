@@ -135,6 +135,30 @@
               <span>Валюта</span>
             </NuxtLink>
           </li>
+          <li>
+            <NuxtLink
+              to="/orders"
+              class="flex items-center px-3 py-2 rounded-xl text-gray-700 hover:bg-blue-100 transition font-medium"
+              active-class="bg-blue-50 text-blue-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                role="img"
+              >
+                <path d="M3 7h18l-1.5 12h-15L3 7z" />
+                <path d="M16 11V7a4 4 0 0 0-8 0v4" />
+              </svg>
+              <span>Заказы</span>
+            </NuxtLink>
+          </li>
         </ul>
       </nav>
     </aside>
